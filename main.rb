@@ -8,10 +8,18 @@ class Main
   token = 'Bot Token'
   chatId = 'Chat Id'
   #
+  #  INLINE KEYBOARDS.
+  tastiera = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Visualizza', url: 'http://www.ansa.it/sito/notizie/topnews/index.shtml')
+  tastiera2 = Telegram::Bot::Types::InlineKeyboardButton.new(text: 'Visualizza', url: 'http://www.rainews.it')
+  markup2 = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: tastiera2)
+  markup = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: tastiera)
+  #
+  #
+  #
   #   DON'T MODIFY NOTHING HERE UNLESS YOU KNOW WHAT YOU'RE DOING
   #
   listofnews = 'null'
-  Telegram::Bot::Client.run(token) do |bot|
+  Telegram::Bot::Client.run(token, logger: Logger.new($stderr)) do |bot|
     ansa = Thread.new {
       while (true) do
         url = URI.parse('http://www.ansa.it/')
@@ -34,7 +42,7 @@ class Main
         descriptionwithoutcode = descriptionwithcode.split('</h2>')[0]
         if (listofnews.include?(urlnuovo[0]))
         else
-          bot.api.send_message(chat_id: chatId, text: "(ANSA) " << titlewithoutcode << " - " << descriptionwithoutcode << "\r\n" << 'http://www.ansa.it' << urlnuovo[0])
+          bot.api.send_message(chat_id: chatId, text: "(ANSA) " << titlewithoutcode << " - " << descriptionwithoutcode << "\r\n" << 'http://www.ansa.it' << urlnuovo[0], reply_markup: markup)
           listofnews += ' ' << urlnuovo[0]
         end
         sleep 5
@@ -56,7 +64,7 @@ class Main
         title = titlewithcode.split('</a>')[0]
         if (listofnews.include?(urlnuovo))
         else
-          bot.api.send_message(chat_id: chatId, text: "(RAI) " << title << "\r\n" << urlnuovo)
+          bot.api.send_message(chat_id: chatId, text: "(RAI) " << title << "\r\n" << urlnuovo, reply_markup: markup2)
           listofnews += ' ' << urlnuovo
         end
         sleep 5
